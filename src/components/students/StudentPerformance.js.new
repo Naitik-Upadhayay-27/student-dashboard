@@ -1,0 +1,523 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  LinearProgress,
+  Divider,
+  useTheme,
+  useMediaQuery,
+  Card,
+  CardContent,
+  CardHeader,
+  Avatar,
+  Fade
+} from '@mui/material';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area
+} from 'recharts';
+
+// Modern color palette
+const COLORS = {
+  attendance: '#3f51b5', // Blue
+  assignments: '#4caf50', // Green
+  exams: '#f44336',      // Red
+  progress: '#e91e63',   // Pink
+  background: '#f5f7fa', // Light background
+  cardBg: '#ffffff',     // Card background
+  text: '#2d3748',       // Dark text
+  textSecondary: '#718096', // Secondary text
+  shadow: 'rgba(0, 0, 0, 0.08)' // Shadow color
+};
+
+const StudentPerformance = ({ student }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [animate, setAnimate] = useState(false);
+  
+  // Animation effect
+  useEffect(() => {
+    setAnimate(true);
+  }, []);
+  
+  // If no performance data is available
+  if (!student.performance) {
+    return (
+      <Fade in={animate} timeout={800}>
+        <Paper sx={{ 
+          p: 4, 
+          borderRadius: '12px', 
+          mt: 4,
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+          bgcolor: COLORS.cardBg
+        }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: COLORS.text }}>
+            Performance Data
+          </Typography>
+          <Typography variant="body1" sx={{ color: COLORS.textSecondary }}>
+            No performance data available for this student.
+          </Typography>
+        </Paper>
+      </Fade>
+    );
+  }
+
+  const { attendance, assignments, exams, monthlyProgress } = student.performance;
+  
+  // Calculate average assignment score
+  const avgAssignmentScore = assignments.reduce((sum, item) => sum + (item.score / item.maxScore) * 100, 0) / assignments.length;
+  
+  // Calculate average exam score
+  const avgExamScore = exams.reduce((sum, item) => sum + (item.score / item.maxScore) * 100, 0) / exams.length;
+  
+  // Prepare data for pie chart with modern colors
+  const pieData = [
+    { name: 'Attendance', value: attendance, color: COLORS.attendance },
+    { name: 'Assignments', value: avgAssignmentScore, color: COLORS.assignments },
+    { name: 'Exams', value: avgExamScore, color: COLORS.exams }
+  ];
+  
+  // Prepare data for area chart (monthly progress)
+  const areaChartData = monthlyProgress.map(item => ({
+    ...item,
+    score: item.score,
+    average: avgAssignmentScore
+  }));
+
+  // Enhanced custom tooltip for charts
+  const CustomTooltip = ({ active, payload, label, type }) => {
+    if (active && payload && payload.length) {
+      const dataType = type || '';
+      const value = payload[0].value;
+      const color = payload[0].color || COLORS.progress;
+      
+      return (
+        <Paper sx={{ 
+          p: 2, 
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', 
+          bgcolor: COLORS.cardBg,
+          borderRadius: '8px',
+          border: '1px solid rgba(0, 0, 0, 0.05)'
+        }}>
+          <Typography variant="subtitle2" sx={{ color: COLORS.text, fontWeight: 600, mb: 0.5 }}>
+            {label}
+          </Typography>
+          <Typography variant="body2" sx={{ color: color, fontWeight: 700 }}>
+            {`${value}${payload[0].unit || '%'}`}
+          </Typography>
+          {dataType && (
+            <Typography variant="caption" sx={{ color: COLORS.textSecondary, display: 'block', mt: 0.5 }}>
+              {dataType}
+            </Typography>
+          )}
+        </Paper>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <Fade in={animate} timeout={800}>
+      <Paper sx={{ 
+        p: { xs: 3, sm: 4 }, 
+        borderRadius: '16px', 
+        mt: 4, 
+        bgcolor: COLORS.background,
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
+      }}>
+        <Typography 
+          variant="h4" 
+          gutterBottom 
+          sx={{ 
+            mb: 4, 
+            fontWeight: 700, 
+            color: COLORS.text,
+            textAlign: 'center',
+            fontSize: { xs: '1.5rem', sm: '2rem' }
+          }}
+        >
+          Performance Dashboard
+        </Typography>
+        
+        <Grid container spacing={3}>
+          {/* TOP ROW: Attendance, Average Scores, Overall Performance */}
+          <Grid item xs={12}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                mb: 2, 
+                fontWeight: 600, 
+                color: COLORS.text, 
+                borderBottom: `1px solid rgba(0,0,0,0.08)`,
+                pb: 1
+              }}
+            >
+              Performance Summary
+            </Typography>
+            <Grid container spacing={3}>
+              {/* Attendance Rate */}
+              <Grid item xs={12} md={4}>
+                <Card sx={{ 
+                  borderRadius: '12px', 
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+                  height: '100%',
+                  width: '100%',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.09)'
+                  }
+                }}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: COLORS.attendance }}>
+                        Attendance Rate
+                      </Typography>
+                      <Typography variant="h3" sx={{ fontWeight: 700, color: COLORS.attendance, mb: 2 }}>
+                        {attendance}%
+                      </Typography>
+                      <LinearProgress 
+                        variant="determinate" 
+                        value={attendance} 
+                        sx={{ 
+                          height: 12, 
+                          borderRadius: 6,
+                          bgcolor: 'rgba(63, 81, 181, 0.1)',
+                          mb: 2,
+                          '& .MuiLinearProgress-bar': {
+                            background: `linear-gradient(90deg, ${COLORS.attendance}99 0%, ${COLORS.attendance} 100%)`,
+                            borderRadius: 6
+                          }
+                        }} 
+                      />
+                      <Typography variant="body2" sx={{ color: COLORS.textSecondary, fontWeight: 500 }}>
+                        {attendance >= 90 ? 'Excellent attendance!' : 
+                        attendance >= 75 ? 'Good attendance' : 'Needs improvement'}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              
+              {/* Average Scores */}
+              <Grid item xs={12} md={4}>
+                <Card sx={{ 
+                  borderRadius: '12px', 
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+                  height: '100%',
+                  width: '100%',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.09)'
+                  }
+                }}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: COLORS.text, textAlign: 'center', mb: 3 }}>
+                      Average Scores
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      <Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="body1" sx={{ color: COLORS.textSecondary, fontWeight: 500 }}>Assignments</Typography>
+                          <Typography variant="h6" sx={{ color: COLORS.assignments, fontWeight: 700 }}>
+                            {Math.round(avgAssignmentScore)}%
+                          </Typography>
+                        </Box>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={avgAssignmentScore} 
+                          sx={{ 
+                            height: 8, 
+                            borderRadius: 4,
+                            bgcolor: 'rgba(76, 175, 80, 0.1)',
+                            '& .MuiLinearProgress-bar': {
+                              background: `linear-gradient(90deg, ${COLORS.assignments}99 0%, ${COLORS.assignments} 100%)`,
+                              borderRadius: 4
+                            }
+                          }} 
+                        />
+                      </Box>
+                      <Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="body1" sx={{ color: COLORS.textSecondary, fontWeight: 500 }}>Exams</Typography>
+                          <Typography variant="h6" sx={{ color: COLORS.exams, fontWeight: 700 }}>
+                            {Math.round(avgExamScore)}%
+                          </Typography>
+                        </Box>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={avgExamScore} 
+                          sx={{ 
+                            height: 8, 
+                            borderRadius: 4,
+                            bgcolor: 'rgba(244, 67, 54, 0.1)',
+                            '& .MuiLinearProgress-bar': {
+                              background: `linear-gradient(90deg, ${COLORS.exams}99 0%, ${COLORS.exams} 100%)`,
+                              borderRadius: 4
+                            }
+                          }} 
+                        />
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              
+              {/* Overall Performance Pie Chart */}
+              <Grid item xs={12} md={4}>
+                <Card sx={{ 
+                  borderRadius: '12px', 
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+                  height: '100%',
+                  width: '100%',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.09)'
+                  }
+                }}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: COLORS.text, textAlign: 'center' }}>
+                      Overall Performance
+                    </Typography>
+                    <Box sx={{ height: 180, display: 'flex', justifyContent: 'center' }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={pieData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={50}
+                            outerRadius={70}
+                            paddingAngle={5}
+                            dataKey="value"
+                            label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                            labelLine={false}
+                          >
+                            {pieData.map((entry, index) => (
+                              <Cell 
+                                key={`cell-${index}`} 
+                                fill={entry.color} 
+                                stroke="#fff"
+                                strokeWidth={2}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip content={<CustomTooltip />} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 1 }}>
+                      {pieData.map((entry, index) => (
+                        <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Box 
+                            sx={{ 
+                              width: 12, 
+                              height: 12, 
+                              borderRadius: '50%', 
+                              bgcolor: entry.color 
+                            }} 
+                          />
+                          <Typography variant="caption" sx={{ color: COLORS.textSecondary }}>
+                            {entry.name}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Grid>
+          
+          {/* MIDDLE ROW: Assignments, Exams, Monthly Progress */}
+          <Grid item xs={12}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                mb: 2, 
+                mt: 2,
+                fontWeight: 600, 
+                color: COLORS.text, 
+                borderBottom: `1px solid rgba(0,0,0,0.08)`,
+                pb: 1
+              }}
+            >
+              Detailed Performance
+            </Typography>
+            <Grid container spacing={3}>
+              {/* Assignment Scores */}
+              <Grid item xs={12} md={4}>
+                <Card sx={{ 
+                  borderRadius: '12px', 
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+                  height: '100%',
+                  width: '100%',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.09)'
+                  }
+                }}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: COLORS.assignments, mb: 2 }}>
+                      Assignment Scores
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
+                      <BarChart data={assignments} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                        <XAxis dataKey="name" tick={{ fontSize: 12, fill: COLORS.textSecondary }} />
+                        <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: COLORS.textSecondary }} />
+                        <Tooltip content={<CustomTooltip type="Assignment" />} />
+                        <Bar 
+                          dataKey="score" 
+                          radius={[4, 4, 0, 0]}
+                        >
+                          {assignments.map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={`url(#assignmentGradient-${index})`} 
+                            />
+                          ))}
+                        </Bar>
+                        <defs>
+                          {assignments.map((entry, index) => (
+                            <linearGradient key={index} id={`assignmentGradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor={COLORS.assignments} stopOpacity={1} />
+                              <stop offset="100%" stopColor={COLORS.assignments} stopOpacity={0.6} />
+                            </linearGradient>
+                          ))}
+                        </defs>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+              
+              {/* Exam Performance */}
+              <Grid item xs={12} md={4}>
+                <Card sx={{ 
+                  borderRadius: '12px', 
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+                  height: '100%',
+                  width: '100%',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.09)'
+                  }
+                }}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: COLORS.exams, mb: 2 }}>
+                      Exam Performance
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+                      {exams.map((exam, index) => (
+                        <Box key={index}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                            <Typography variant="body1" sx={{ fontWeight: 500, color: COLORS.text }}>{exam.name}</Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 700, color: COLORS.exams }}>
+                              {Math.round((exam.score / exam.maxScore) * 100)}%
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <LinearProgress 
+                              variant="determinate" 
+                              value={(exam.score / exam.maxScore) * 100} 
+                              sx={{ 
+                                flexGrow: 1,
+                                height: 10, 
+                                borderRadius: 5,
+                                bgcolor: 'rgba(244, 67, 54, 0.1)',
+                                '& .MuiLinearProgress-bar': {
+                                  background: `linear-gradient(90deg, ${COLORS.exams}99 0%, ${COLORS.exams} 100%)`,
+                                  borderRadius: 5
+                                }
+                              }} 
+                            />
+                            <Typography variant="body2" sx={{ color: COLORS.textSecondary, minWidth: 70, textAlign: 'right' }}>
+                              {exam.score}/{exam.maxScore}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              
+              {/* Monthly Progress */}
+              <Grid item xs={12} md={4}>
+                <Card sx={{ 
+                  borderRadius: '12px', 
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+                  height: '100%',
+                  width: '100%',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.09)'
+                  }
+                }}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: COLORS.progress, mb: 2 }}>
+                      Monthly Progress
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
+                      <AreaChart data={areaChartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                        <XAxis dataKey="month" tick={{ fontSize: 12, fill: COLORS.textSecondary }} />
+                        <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: COLORS.textSecondary }} />
+                        <Tooltip content={<CustomTooltip type="Monthly Score" />} />
+                        <defs>
+                          <linearGradient id="progressGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={COLORS.progress} stopOpacity={0.8} />
+                            <stop offset="95%" stopColor={COLORS.progress} stopOpacity={0.1} />
+                          </linearGradient>
+                        </defs>
+                        <Area 
+                          type="monotone" 
+                          dataKey="score" 
+                          stroke={COLORS.progress} 
+                          strokeWidth={3}
+                          fillOpacity={1}
+                          fill="url(#progressGradient)"
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="average" 
+                          stroke="rgba(0,0,0,0.2)" 
+                          strokeWidth={1}
+                          strokeDasharray="5 5"
+                          dot={false}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Paper>
+    </Fade>
+  );
+};
+
+export default StudentPerformance;

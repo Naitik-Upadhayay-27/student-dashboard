@@ -16,7 +16,28 @@ const students = [
     course: 'Computer Science',
     grade: 'A',
     enrollmentDate: '2023-09-01',
-    avatar: 'https://mui.com/static/images/avatar/1.jpg'
+    avatar: 'https://mui.com/static/images/avatar/1.jpg',
+    performance: {
+      attendance: 92,
+      assignments: [
+        { name: 'Assignment 1', score: 85, maxScore: 100 },
+        { name: 'Assignment 2', score: 92, maxScore: 100 },
+        { name: 'Assignment 3', score: 78, maxScore: 100 },
+        { name: 'Assignment 4', score: 88, maxScore: 100 }
+      ],
+      exams: [
+        { name: 'Midterm Exam', score: 78, maxScore: 100 },
+        { name: 'Final Exam', score: 85, maxScore: 100 }
+      ],
+      monthlyProgress: [
+        { month: 'Jan', score: 75 },
+        { month: 'Feb', score: 80 },
+        { month: 'Mar', score: 85 },
+        { month: 'Apr', score: 82 },
+        { month: 'May', score: 88 },
+        { month: 'Jun', score: 90 }
+      ]
+    }
   },
   {
     id: 2,
@@ -25,7 +46,28 @@ const students = [
     course: 'Mathematics',
     grade: 'B+',
     enrollmentDate: '2023-08-15',
-    avatar: 'https://mui.com/static/images/avatar/2.jpg'
+    avatar: 'https://mui.com/static/images/avatar/2.jpg',
+    performance: {
+      attendance: 85,
+      assignments: [
+        { name: 'Assignment 1', score: 78, maxScore: 100 },
+        { name: 'Assignment 2', score: 82, maxScore: 100 },
+        { name: 'Assignment 3', score: 88, maxScore: 100 },
+        { name: 'Assignment 4', score: 75, maxScore: 100 }
+      ],
+      exams: [
+        { name: 'Midterm Exam', score: 72, maxScore: 100 },
+        { name: 'Final Exam', score: 80, maxScore: 100 }
+      ],
+      monthlyProgress: [
+        { month: 'Jan', score: 70 },
+        { month: 'Feb', score: 75 },
+        { month: 'Mar', score: 78 },
+        { month: 'Apr', score: 80 },
+        { month: 'May', score: 82 },
+        { month: 'Jun', score: 85 }
+      ]
+    }
   },
   {
     id: 3,
@@ -43,7 +85,28 @@ const students = [
     course: 'Computer Science',
     grade: 'B',
     enrollmentDate: '2023-09-10',
-    avatar: 'https://mui.com/static/images/avatar/4.jpg'
+    avatar: 'https://mui.com/static/images/avatar/4.jpg',
+    performance: {
+      attendance: 88,
+      assignments: [
+        { name: 'Assignment 1', score: 82, maxScore: 100 },
+        { name: 'Assignment 2', score: 78, maxScore: 100 },
+        { name: 'Assignment 3', score: 85, maxScore: 100 },
+        { name: 'Assignment 4', score: 80, maxScore: 100 }
+      ],
+      exams: [
+        { name: 'Midterm Exam', score: 76, maxScore: 100 },
+        { name: 'Final Exam', score: 82, maxScore: 100 }
+      ],
+      monthlyProgress: [
+        { month: 'Jan', score: 75 },
+        { month: 'Feb', score: 78 },
+        { month: 'Mar', score: 80 },
+        { month: 'Apr', score: 82 },
+        { month: 'May', score: 85 },
+        { month: 'Jun', score: 88 }
+      ]
+    }
   },
   {
     id: 5,
@@ -52,7 +115,28 @@ const students = [
     course: 'Mathematics',
     grade: 'A+',
     enrollmentDate: '2023-08-20',
-    avatar: 'https://mui.com/static/images/avatar/5.jpg'
+    avatar: 'https://mui.com/static/images/avatar/5.jpg',
+    performance: {
+      attendance: 98,
+      assignments: [
+        { name: 'Assignment 1', score: 95, maxScore: 100 },
+        { name: 'Assignment 2', score: 98, maxScore: 100 },
+        { name: 'Assignment 3', score: 92, maxScore: 100 },
+        { name: 'Assignment 4', score: 97, maxScore: 100 }
+      ],
+      exams: [
+        { name: 'Midterm Exam', score: 96, maxScore: 100 },
+        { name: 'Final Exam', score: 98, maxScore: 100 }
+      ],
+      monthlyProgress: [
+        { month: 'Jan', score: 90 },
+        { month: 'Feb', score: 92 },
+        { month: 'Mar', score: 94 },
+        { month: 'Apr', score: 95 },
+        { month: 'May', score: 97 },
+        { month: 'Jun', score: 98 }
+      ]
+    }
   },
   {
     id: 6,
