@@ -31,7 +31,7 @@ import {
 } from '@mui/icons-material';
 
 const AdvancedFilters = ({ 
-  courses, 
+  courses = [], 
   onFilterChange, 
   onSortChange, 
   onClearFilters,
@@ -254,7 +254,7 @@ const AdvancedFilters = ({
                   startAdornment={<School sx={{ color: 'action.active', mr: 1 }} />}
                 >
                   <MenuItem value="">All Courses</MenuItem>
-                  {courses.map((course) => (
+                  {(courses || []).map((course) => (
                     <MenuItem key={course} value={course}>
                       {course}
                     </MenuItem>

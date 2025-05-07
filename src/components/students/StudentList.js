@@ -35,6 +35,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../services/mockApi';
 import ImportExport from './ImportExport';
 import AdvancedFilters from './AdvancedFilters';
+import MobileAdvancedFilters from './MobileAdvancedFilters';
 import AttendanceTracker from './AttendanceTracker';
 
 const StudentList = () => {
@@ -47,6 +48,7 @@ const StudentList = () => {
   const [advancedFilters, setAdvancedFilters] = useState({});
   const [sortOption, setSortOption] = useState('name_asc');
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -61,6 +63,12 @@ const StudentList = () => {
       console.log('Fetched students:', data);
       setStudents(data);
       setFilteredStudents(data);
+      
+      // Extract unique courses from student data
+      if (data && data.length > 0) {
+        const uniqueCourses = [...new Set(data.map(student => student.course))];
+        setCourses(uniqueCourses.filter(course => course)); // Filter out any null/undefined values
+      }
     } catch (error) {
       console.error('Error fetching students:', error);
     } finally {
@@ -156,8 +164,7 @@ const StudentList = () => {
     }
   };
 
-  // Get unique courses for the filter dropdown
-  const courses = [...new Set(students.map(student => student.course))];
+  // Courses are now extracted in the fetchStudents function
 
   const handleViewDetails = (studentId) => {
     navigate(`/student/${studentId}`);
@@ -205,7 +212,7 @@ const StudentList = () => {
   }
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+    <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto', p: { xs: 1, sm: 2 } }}>
       <Box sx={{ 
         display: 'flex', 
         flexDirection: { xs: 'column', sm: 'row' },
@@ -233,55 +240,119 @@ const StudentList = () => {
             borderRadius: 2,
             alignSelf: { xs: 'stretch', sm: 'auto' }
           }}
-          fullWidth={window.innerWidth < 600}
+          fullWidth={isMobile}
         >
           Add New Student
         </Button>
       </Box>
       
       {/* Tabs for different views */}
-      <Paper sx={{ mb: 3, borderRadius: 2 }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs 
           value={activeTab} 
           onChange={handleTabChange} 
-          variant="fullWidth"
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
+          aria-label="student dashboard tabs"
+          variant={isMobile ? "fullWidth" : "standard"}
         >
           <Tab 
+            label={isMobile ? "Students" : "Student List"} 
             icon={<ViewList />} 
-            label="Student List" 
-            iconPosition="start"
+            iconPosition="start" 
           />
           <Tab 
+            label={isMobile ? "Attendance" : "Attendance Tracker"} 
             icon={<CalendarMonth />} 
-            label="Attendance Tracker" 
-            iconPosition="start"
+            iconPosition="start" 
           />
         </Tabs>
-      </Paper>
+      </Box>
 
       {/* Tab Content */}
       {activeTab === 0 ? (
         // Student List Tab
         <>
-          <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, mb: 4, borderRadius: 2 }}>
-            <ImportExport />
-            <Divider sx={{ my: 2 }} />
+          <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', sm: 'row' }, 
+              alignItems: { xs: 'stretch', sm: 'center' }, 
+              mb: 3,
+              gap: 1
+            }}>
+              <Typography variant="h5" component="h1" sx={{ 
+                flexGrow: 1,
+                mb: { xs: 1, sm: 0 },
+                fontSize: { xs: '1.25rem', sm: '1.5rem' }
+              }}>
+                Student List
+              </Typography>
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'row' }, 
+                justifyContent: { xs: 'space-between', sm: 'flex-end' },
+                width: { xs: '100%', sm: 'auto' },
+                gap: 1
+              }}>
+                <ImportExport students={students} refreshData={fetchStudents} />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleAddStudent}
+                  size={isMobile ? "small" : "medium"}
+                >
+                  Add Student
+                </Button>
+              </Box>
+            </Box>
             
-            {/* Advanced Filters */}
-            <AdvancedFilters 
-              courses={courses}
-              onFilterChange={handleAdvancedFilterChange}
-              onSortChange={handleSortChange}
-              onClearFilters={handleClearFilters}
-              initialFilters={{
-                sortOption,
-                ...advancedFilters
-              }}
-            />
-            
-            <Divider sx={{ my: 2 }} />
-            
+            {/* Advanced Filters - Mobile as drawer, Desktop inline */}
+            {isMobile ? (
+              <Drawer
+                anchor="bottom"
+                open={filterDrawerOpen}
+                onClose={toggleFilterDrawer}
+              >
+                <Box sx={{ 
+                  width: '100%', 
+                  maxWidth: '100%',
+                  p: 2,
+                  maxHeight: '90vh',
+                  overflow: 'auto'
+                }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6">Filters</Typography>
+                    <Button 
+                      onClick={toggleFilterDrawer} 
+                      size="small" 
+                      variant="outlined"
+                      color="primary"
+                    >
+                      Close
+                    </Button>
+                  </Box>
+                  <Divider sx={{ mb: 2 }} />
+                  <MobileAdvancedFilters 
+                    filters={advancedFilters} 
+                    courses={courses}
+                    onFilterChange={handleAdvancedFilterChange} 
+                    onClearFilters={handleClearFilters}
+                    initialFilters={{ sortOption }}
+                  />
+                </Box>
+              </Drawer>
+            ) : (
+              <Box sx={{ mt: 3, display: filterDrawerOpen ? 'block' : 'none' }}>
+                <AdvancedFilters 
+                  filters={advancedFilters} 
+                  courses={courses}
+                  onFilterChange={handleAdvancedFilterChange} 
+                  onSortChange={handleSortChange}
+                  onClearFilters={handleClearFilters}
+                  initialFilters={{ sortOption }}
+                />
+              </Box>
+            )}
+
             {/* Basic Search and Filter */}
             <Paper sx={{ p: 2, mb: 3 }}>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
@@ -298,7 +369,7 @@ const StudentList = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     fullWidth
-                    size={window.innerWidth < 600 ? "small" : "medium"}
+                    size={isMobile ? "small" : "medium"}
                     sx={{ 
                       flex: { xs: '1 1 100%', sm: '1 1 60%', md: '1 1 70%' },
                     }}
@@ -317,10 +388,9 @@ const StudentList = () => {
                     value={courseFilter}
                     onChange={(e) => setCourseFilter(e.target.value)}
                     fullWidth
-                    size={window.innerWidth < 600 ? "small" : "medium"}
+                    size={isMobile ? "small" : "medium"}
                     sx={{ 
                       flex: { xs: '1 1 100%', sm: '1 1 30%', md: '1 1 20%' },
-                      display: { xs: 'none', sm: 'flex' }
                     }}
                     InputProps={{
                       startAdornment: (
@@ -340,17 +410,19 @@ const StudentList = () => {
                 </Box>
                 
                 {/* Filter Button for Mobile */}
-                <IconButton 
+                <Button 
+                  variant="outlined"
                   color="primary" 
                   onClick={toggleFilterDrawer}
+                  size="small"
                   sx={{ 
                     display: { xs: 'flex', md: 'none' },
                     ml: 'auto'
                   }}
-                  aria-label="Open filters"
+                  startIcon={<TuneIcon />}
                 >
-                  <TuneIcon />
-                </IconButton>
+                  Filters
+                </Button>
                 
                 {/* Advanced Filters for Desktop */}
                 <Box sx={{ 
@@ -358,20 +430,20 @@ const StudentList = () => {
                   ml: 'auto',
                   gap: 1
                 }}>
-                  <Button 
+                  <Button
                     variant="outlined" 
-                    startIcon={<FilterList />}
+                    startIcon={isMobile ? <TuneIcon /> : <FilterList />}
                     onClick={toggleFilterDrawer}
-                    size={window.innerWidth < 600 ? "small" : "medium"}
+                    size={isMobile ? "small" : "medium"}
                   >
-                    Advanced Filters
+                    {isMobile ? "Filters" : "Advanced Filters"}
                   </Button>
                 </Box>
               </Box>
             </Paper>
 
             {/* Student Grid */}
-            <Grid container spacing={2} sx={{ 
+            <Grid container spacing={{ xs: 1, sm: 2 }} sx={{ 
               justifyContent: 'center',
               mt: 2
             }}>
@@ -384,8 +456,9 @@ const StudentList = () => {
                   }}>
                     <Card 
                       sx={{ 
-                        height: 260, // Fixed height for all cards
-                        width: 280, // Fixed width for all cards
+                        height: { xs: 240, sm: 260 }, // Responsive height
+                        width: { xs: '100%', sm: 280 }, // Responsive width
+                        maxWidth: '100%',
                         display: 'flex', 
                         flexDirection: 'column',
                         transition: 'transform 0.3s, box-shadow 0.3s',
