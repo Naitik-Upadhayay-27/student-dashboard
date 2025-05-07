@@ -23,10 +23,22 @@ function App() {
           <CssBaseline />
           <Navbar />
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<StudentList />} />
-            <Route path="/students" element={<StudentList />} />
-            <Route path="/student/:id" element={<StudentDetail />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <StudentList />
+              </ProtectedRoute>
+            } />
+            <Route path="/students" element={
+              <ProtectedRoute>
+                <StudentList />
+              </ProtectedRoute>
+            } />
+            <Route path="/student/:id" element={
+              <ProtectedRoute>
+                <StudentDetail />
+              </ProtectedRoute>
+            } />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route 
