@@ -211,18 +211,18 @@ const Navbar = () => {
               color="inherit" 
               onClick={() => navigate('/register')}
               startIcon={isMobile ? null : <PersonAdd />}
-              variant="outlined"
+              variant={isMobile ? "text" : "outlined"}
               size={isMobile ? "small" : "medium"}
               sx={{ 
-                borderColor: 'white', 
+                borderColor: isMobile ? 'transparent' : 'white', 
                 '&:hover': { 
-                  borderColor: 'rgba(255, 255, 255, 0.8)',
+                  borderColor: isMobile ? 'transparent' : 'rgba(255, 255, 255, 0.8)',
                   backgroundColor: 'rgba(255, 255, 255, 0.1)'
                 },
                 px: { xs: 1, sm: 2 }
               }}
             >
-              {isMobile ? "Sign Up" : "Register"}
+              {"Register"}
             </Button>
           </Box>
         )}
