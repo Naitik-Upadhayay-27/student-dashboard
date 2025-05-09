@@ -21,8 +21,7 @@ import {
   DialogContentText,
   DialogTitle,
   Snackbar,
-  Alert,
-  Container
+  Alert
 } from '@mui/material';
 import {
   School,
@@ -93,17 +92,17 @@ const StudentDetail = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg">
+      <Box sx={{ maxWidth: 1200, mx: 'auto', width: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
           <CircularProgress />
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg">
+      <Box sx={{ maxWidth: 1200, mx: 'auto', width: '100%' }}>
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <Typography variant="h6" color="error">{error}</Typography>
           <Button 
@@ -115,13 +114,13 @@ const StudentDetail = () => {
             Back to Dashboard
           </Button>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   if (!student) {
     return (
-      <Container maxWidth="lg">
+      <Box sx={{ maxWidth: 1200, mx: 'auto', width: '100%' }}>
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <Typography variant="h6">Student not found</Typography>
           <Button 
@@ -133,12 +132,12 @@ const StudentDetail = () => {
             Back to Dashboard
           </Button>
         </Box>
-      </Container>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="lg">
+    <Box sx={{ maxWidth: 1200, mx: 'auto', width: '100%' }}>
       <Box sx={{ p: { xs: 2, sm: 3 } }}>
         {/* Navigation Buttons */}
         <Box sx={{ 
@@ -365,7 +364,7 @@ const StudentDetail = () => {
           </Alert>
         </Snackbar>
       </Box>
-    </Container>
+    </Box>
   );
 };
 
